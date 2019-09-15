@@ -42,4 +42,9 @@ target_link_libraries(_realitycore
 # Copy test files to the build directory
 add_custom_command(TARGET _realitycore POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_LIST_DIR}/test $<TARGET_FILE_DIR:_realitycore>)
+    ${CMAKE_CURRENT_LIST_DIR}/test $<TARGET_FILE_DIR:_realitycore>
+)
+
+install(TARGETS _realitycore
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+)
