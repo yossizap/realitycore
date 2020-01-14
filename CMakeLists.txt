@@ -49,6 +49,12 @@ if (WIN32)
         PUBLIC
         $<TARGET_FILE_DIR:_realitycore>
     )
+
+    # Replace the python27.dll import that pybind adds into the binary
+    add_custom_command(TARGET _realitycore
+        POST_BUILD
+        COMMAND python ${PROJECT_SOURCE_DIR}/scripts/fix_dll_import.py $<TARGET_FILE_DIR:_realitycore>/_realitycore.pyd
+    )
 endif (WIN32)
 
 # Copy test files to the build directory
