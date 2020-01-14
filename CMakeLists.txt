@@ -1,31 +1,39 @@
 cmake_minimum_required(VERSION 3.10)
+project(realitycore)
 
-project(_realitycore)
+set(PYBIND11_CPP_STANDARD -std=c++14)
+set(PYBIND11_PYTHON_VERSION 2.7 CACHE STRING "")
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_subdirectory(third_party/pybind11)
 
-set(PYTHON_VERSION 2.7)
-find_package(PythonLibs ${PYTHON_VERSION} REQUIRED)
-
-add_library(_realitycore 
-  SHARED 
-    src/_realitycore.c
+# To compile against the BF2 CPython executables:
+## Linux
+# Add the following args cmake:
+# -DPYTHON_LIBRARY=<Path to BF2-CPython>/libpython2.7.so
+# -DPYTHON_INCLUDE_DIR=<Path to BF2-CPython>/Include/
+# -DPYTHON_EXECUTABLE=<Path to BF2-CPython>/python
+#
+## Windows
+# You have to compile a static 32bit version of the dice_py.dll (See
+# github.com/yossizap/CPython for more information) and move it to
+# <Path to BF2-CPython>/lib/Python27.lib (Custom PYTHON_LIBRARY name doesn't work with pybind's find)
+#
+# Add the following args cmake:
+# -DPYTHON_LIBRARY=<Path to BF2-CPython>/libpython2.7.lib
+# -DPYTHON_INCLUDE_DIR=<Path to BF2-CPython>/Include/ ..
+# -DPYTHON_EXECUTABLE=<Path to BF2-CPython>/PCBuild/python.exe
+# -A"Win32"
+pybind11_add_module(_realitycore
+    src/realitycore.cpp
+    MODULE
 )
 
-set_target_properties(_realitycore
-  PROPERTIES
-    PREFIX ""
-    OUTPUT_NAME "_realitycore"
-    LINKER_LANGUAGE C
+# Manually add the include library since pybind doesn't
+target_include_directories(_realitycore PUBLIC
+    ${PYTHON_INCLUDE_DIR}
 )
 
-if(WIN32)
-    set_target_properties(_realitycore
-        PROPERTIES
-          SUFFIX ".pyd"
-    )
-
+if (WIN32)
     target_include_directories(_realitycore 
         PUBLIC
         ${PYTHON_INCLUDE_DIR}/../PC
@@ -41,24 +49,10 @@ if(WIN32)
         PUBLIC
         $<TARGET_FILE_DIR:_realitycore>
     )
-endif()
-
-target_include_directories(_realitycore
-  PUBLIC
-    ${PYTHON_INCLUDE_DIRS}
-)
-
-target_link_libraries(_realitycore
-  PRIVATE
-    ${PYTHON_LIBRARIES}
-)
+endif (WIN32)
 
 # Copy test files to the build directory
 add_custom_command(TARGET _realitycore POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_LIST_DIR}/test $<TARGET_FILE_DIR:_realitycore>
-)
-
-install(TARGETS _realitycore
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
 )

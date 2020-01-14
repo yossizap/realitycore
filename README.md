@@ -20,7 +20,7 @@ To compile against the BF2 CPython executables and libraries:
     
     mkdir build; cd build
     cmake .. \
-        -DPYTHON_LIBRARY=<Path to BF2-CPython>/libpython2.7.lib \
+        -DPYTHON_LIBRARY=<Path to BF2-CPython>/PCBuild/dice_py.lib \
         -DPYTHON_INCLUDE_DIR=<Path to BF2-CPython>/Include/ \
         -DPYTHON_EXECUTABLE=<Path to BF2-CPython>/PCBuild/python.exe \
         -A"Win32" \
